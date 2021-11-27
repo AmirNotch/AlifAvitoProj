@@ -1,4 +1,5 @@
 using AlifAvitoProj.Context;
+using AlifAvitoProj.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,8 @@ namespace AlifAvitoProj
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AlifAvitoProj", Version = "v1" });
             });
+
+            services.AddScoped<ICityRepository, CityRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,7 +66,7 @@ namespace AlifAvitoProj
                 endpoints.MapControllers();
             });
 
-            context.SeedDataContext();
+            //context.SeedDataContext();
             /*app.UseMvc();*/
         }
     }

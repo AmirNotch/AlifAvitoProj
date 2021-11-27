@@ -21,6 +21,11 @@ namespace AlifAvitoProj.Services
             return _avitoDbContext.Cities.Any(c => c.Name == countryName);
         }
 
+        public bool CityExistsById(int countryId)
+        {
+            return _avitoDbContext.Cities.Any(c => c.Id == countryId);
+        }
+
         public bool CreateCity(City city)
         {
             _avitoDbContext.AddAsync(city);
@@ -43,19 +48,25 @@ namespace AlifAvitoProj.Services
             return _avitoDbContext.Cities.Where(c => c.Name.Contains(countryName)).FirstOrDefault();
         }
 
-        public City GetCityOfAnUser(int authorId)
+        public City GetCityOfAnUser(string userName)
         {
-            throw new NotImplementedException();
+            return _avitoDbContext.Users.Where(a => a.FirstName == userName).Select(c => c.City).FirstOrDefault();
         }
 
-        public ICollection<City> GetUsersFromCity(int countryId)
+        public ICollection<User> GetUsersFromCity(int countryId)
         {
-            throw new NotImplementedException();
+            return _avitoDbContext.Users.Where(c => c.City.Id == countryId).ToList();
         }
 
-        public bool IsDuplicateCityName(string countryName)
+        public bool IsDuplicateCityName(string cityName, string cityClassName)
         {
-            var country = _avitoDbContext.Cities.Where(c => c.Name.Trim().ToUpper() == countryName.Trim().ToUpper()).FirstOrDefault();
+            var country = _avitoDbContext.Cities.Where(c => c.Name.Trim().ToUpper() == cityName.Trim().ToUpper()).FirstOrDefault();
+            return country == null ? false : true;
+        }
+        
+        public bool IsDuplicateCityId(int cityId, string cityClassName)
+        {
+            var country = _avitoDbContext.Cities.Where(c => c.Name.Trim().ToUpper() == cityClassName.Trim().ToUpper()).FirstOrDefault();
             return country == null ? false : true;
         }
 
@@ -69,6 +80,11 @@ namespace AlifAvitoProj.Services
         {
             _avitoDbContext.Update(city);
             return Save();
+        }
+
+        public City GetCityById(int countryId)
+        {
+            return _avitoDbContext.Cities.Where(c => c.Id == countryId).FirstOrDefault();
         }
     }
 }

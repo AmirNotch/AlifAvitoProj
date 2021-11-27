@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlifAvitoProj.Migrations
 {
     [DbContext(typeof(AvitoDbContext))]
-    [Migration("20211127061657_Init")]
+    [Migration("20211127074252_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
