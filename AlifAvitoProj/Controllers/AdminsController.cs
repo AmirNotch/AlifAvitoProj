@@ -248,7 +248,7 @@ namespace AlifAvitoProj.Controllers
         }
 
         //api/categories/category
-        [HttpPost("GetCategory", Name = "GetCategory")]
+        [HttpPost("categories/GetCategory", Name = "GetCategory")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
@@ -273,7 +273,7 @@ namespace AlifAvitoProj.Controllers
 
 
         //api/categories
-        [HttpPost("categoryName")]
+        [HttpPost("categories/categoryName")]
         [ProducesResponseType(400)]
         [ProducesResponseType(422)]
         [ProducesResponseType(500)]
@@ -311,7 +311,7 @@ namespace AlifAvitoProj.Controllers
 
 
         //api/admins/categoryId
-        [HttpPut("put/{categoryId}")]
+        [HttpPut("categories/put/{categoryId}")]
         [ProducesResponseType(204)] // no content
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -360,7 +360,7 @@ namespace AlifAvitoProj.Controllers
 
 
         //api/categories/categoryId/books
-        [HttpGet("{categoryId}/books")]
+        [HttpGet("categories/{categoryId}/books")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<AdvertDto>))]
@@ -392,7 +392,7 @@ namespace AlifAvitoProj.Controllers
         }
 
         //api/categories/books/bookId
-        [HttpGet("advertss/{advertId}")]
+        [HttpGet("categories/adverts/{advertId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
@@ -422,7 +422,7 @@ namespace AlifAvitoProj.Controllers
 
 
         //api/admins/categoryId
-        [HttpDelete("delete/{categoryId}")]
+        [HttpDelete("categories/delete/{categoryId}")]
         [ProducesResponseType(204)] // no content
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
