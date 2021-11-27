@@ -15,9 +15,11 @@ namespace AlifAvitoProj.Controllers
     public class AdminsController : ControllerBase
     {
         private ICityRepository _cityRepository;
+        private ICategoryRepository _categoryRepository;
 
-        public AdminsController(ICityRepository cityRepository)
+        public AdminsController(ICityRepository cityRepository, ICategoryRepository categoryRepository)
         {
+            _categoryRepository = categoryRepository;
             _cityRepository = cityRepository;
         }
 
@@ -215,5 +217,245 @@ namespace AlifAvitoProj.Controllers
 
             return NoContent();
         }
+
+        /////////////////////////////////
+        ///   Categories
+        ////////////////////////////////
+
+
+        //api/admins/categories
+        [HttpGet("categories")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
+        public IActionResult GetCategories()
+        {
+            var categories = _categoryRepository.GetCategories().ToList();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var categoriesDto = new List<CategoryDto>();
+            foreach (var category in categories)
+            {
+                categoriesDto.Add(new CategoryDto
+                {
+                    Id = category.Id,
+                    Name = category.Name,
+                });
+            }
+
+            return Ok(categoriesDto);
+        }
+
+        //api/categories/category
+        [HttpPost("GetCategory", Name = "GetCategory")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
+        public IActionResult GetCategory(string categoryName)
+        {
+            if (!_categoryRepository.CategoryExists(categoryName))
+                return NotFound();
+
+            var category = _categoryRepository.GetCategory(categoryName);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var categoryDto = new CategoryDto()
+            {
+                Id = category.Id,
+                Name = category.Name
+            };
+
+            return Ok(categoryDto);
+        }
+
+
+        //api/categories
+        [HttpPost("categoryName")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(200, Type = typeof(Category))]
+        public async Task<IActionResult> CreateCategory([FromBody] Category categoryToCreate)
+        {
+            if (categoryToCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var country = _categoryRepository.GetCategories()
+                            .Where(c => c.Name.Trim().ToUpper() == categoryToCreate.Name.Trim().ToUpper())
+                            .FirstOrDefault();
+
+            if (country != null)
+            {
+                ModelState.AddModelError("", $"Category {categoryToCreate.Name} alreade exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_categoryRepository.CreateCategory(categoryToCreate))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving {categoryToCreate.Name}");
+                return StatusCode(500, ModelState);
+            }
+
+            return CreatedAtRoute("GetCategory", new { categoryId = categoryToCreate.Id }, categoryToCreate);
+        }
+
+
+        //api/admins/categoryId
+        [HttpPut("put/{categoryId}")]
+        [ProducesResponseType(204)] // no content
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(200, Type = typeof(Category))]
+        public async Task<IActionResult> UpdateCategory(int categoryId, [FromBody]Category updatedCategoryInfo)
+        {
+            /*Category category = new Category()
+            {
+                Id = categoryId, 
+                Name = updatedCategoryInfo   
+            };*/
+            updatedCategoryInfo.Id = categoryId;
+
+            if (updatedCategoryInfo == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            /*if (countryId != updatedCountryInfo.Id)
+            {
+                return BadRequest(ModelState);
+            }*/
+
+            if (!_categoryRepository.CategoryExistsById(categoryId))
+            {
+                return NotFound();
+            }
+
+            if (_categoryRepository.IsDuplicateCategoryById(categoryId, updatedCategoryInfo.Name))
+            {
+                ModelState.AddModelError("", $"Category {updatedCategoryInfo} alreade exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_categoryRepository.UpdateCategory(updatedCategoryInfo))
+            {
+                ModelState.AddModelError("", $"Something went wrong updating {updatedCategoryInfo.Name}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+
+        //api/categories/categoryId/books
+        [HttpGet("{categoryId}/books")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<AdvertDto>))]
+        public async Task<IActionResult> GetAllAdvertsForACategory(int categoryId)
+        {
+            if (!_categoryRepository.CategoryExistsById(categoryId))
+                return NotFound();
+
+            var adverts = _categoryRepository.GetAllAdvertsForCategory(categoryId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var advertsDto = new List<AdvertDto>();
+
+            foreach (var advert in adverts)
+            {
+                advertsDto.Add(new AdvertDto
+                {
+                    Id = advert.Id, 
+                    Title = advert.Title,
+                    ReviewText = advert.ReviewText,
+                    Cost = advert.Cost,
+                    DatePublished = advert.DatePublished
+                });
+            }
+
+            return Ok(advertsDto);
+        }
+
+        //api/categories/books/bookId
+        [HttpGet("advertss/{advertId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
+        public async Task<IActionResult> GetAllCategoriesForAdvert(int advertId)
+        {
+            /*if (!_bookRepository.BookExists(bookId))
+            {
+                return NotFound();
+            }*/
+            var categories = _categoryRepository.GetAllCategoriesForAdvert(advertId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var categoriesDto = new List<CategoryDto>();
+            foreach (var category in categories)
+            {
+                categoriesDto.Add(new CategoryDto
+                {
+                    Id = category.Id,
+                    Name = category.Name
+                });
+            }
+
+            return Ok(categoriesDto);
+        }
+
+
+        //api/admins/categoryId
+        [HttpDelete("delete/{categoryId}")]
+        [ProducesResponseType(204)] // no content
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteCategory(int categoryId)
+        {
+            if (!_categoryRepository.CategoryExistsById(categoryId))
+            {
+                return NotFound();
+            }
+
+            var deleteCategory = _categoryRepository.GetCategoryById(categoryId);
+
+            if (_categoryRepository.GetAllAdvertsForCategory(categoryId).Count() > 0)
+            {
+                ModelState.AddModelError("", $"Category {deleteCategory.Name} " +
+                                                                "can not be deleted because books used this category");
+                return StatusCode(409, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_categoryRepository.DeleteCategory(deleteCategory))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting {deleteCategory.Name}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
     }
 }
