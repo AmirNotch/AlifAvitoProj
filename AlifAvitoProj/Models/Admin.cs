@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AlifAvitoProj.Models
 {
-    public class User
+    public class Admin
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,13 +18,9 @@ namespace AlifAvitoProj.Models
         public string FirstName { get; set; }
 
         [Required]
-        [StringLength(50, MinimumLength = 6, ErrorMessage = "Пароль пользователя должен содержать между 6 - 50 символов")]
+        [StringLength(50, MinimumLength = 6, ErrorMessage = "Пароль админа должен содержать между 6 - 50 символов")]
         public string Password { get; set; }
 
-        [Required]
-        public int PhoneNumber { get; set; }
-        public virtual City City { get; set; }
-        public virtual WarningUser WarningUser { get; set; }
-        public virtual ICollection<AdvertUser> AdvertUsers { get; set; }
+        public ICollection<WarningUser> WarningUsers { get; set; }
     }
 }
