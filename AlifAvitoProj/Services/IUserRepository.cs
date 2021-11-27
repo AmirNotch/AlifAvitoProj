@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace AlifAvitoProj.Services
 {
-    interface IUserRepository
+    public interface IUserRepository
     {
         ICollection<User> GetUsers();
         User GetUser(string userFirstName);
+        User GetUserByPhone(int userPhone);
         User GetUserById(int userid);
         ICollection<User> GetUsersOfAdvert(int advertId);
         ICollection<Advert> GetAdvertsByUser(int userId);

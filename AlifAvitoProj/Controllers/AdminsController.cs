@@ -16,11 +16,13 @@ namespace AlifAvitoProj.Controllers
     {
         private ICityRepository _cityRepository;
         private ICategoryRepository _categoryRepository;
+        private IUserRepository _userRepository;
 
-        public AdminsController(ICityRepository cityRepository, ICategoryRepository categoryRepository)
+        public AdminsController(ICityRepository cityRepository, ICategoryRepository categoryRepository, IUserRepository userRepository)
         {
             _categoryRepository = categoryRepository;
             _cityRepository = cityRepository;
+            _userRepository = userRepository;
         }
 
         //api/admins
@@ -455,6 +457,71 @@ namespace AlifAvitoProj.Controllers
             }
 
             return NoContent();
+        }
+
+
+
+        /////////////////////////
+        ///     Users
+        ////////////////////////
+
+        //api/users
+        [HttpGet("users")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<UserDto>))]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = _userRepository.GetUsers();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var usersDto = new List<UserDto>();
+
+            foreach (var user in users)
+            {
+                usersDto.Add(new UserDto
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    PhoneNumber = user.PhoneNumber
+                });
+            }
+
+            return Ok(usersDto);
+        }
+
+
+        //api/authors/authorId
+        [HttpPost("users", Name = "GetUsers")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<UserDto>))]
+        public async Task<IActionResult> GetUser(int userPhone)
+        {
+            if (!_userRepository.UserExistsByPhone(userPhone))
+            {
+                return NotFound();
+            }
+
+            var user = _userRepository.GetUserByPhone(userPhone);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return Ok(userDto);
         }
 
     }

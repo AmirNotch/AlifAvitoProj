@@ -74,5 +74,10 @@ namespace AlifAvitoProj.Services
         {
             return _userContext.Users.Where(u => u.Id == userid).FirstOrDefault();
         }
+
+        public User GetUserByPhone(int userPhone)
+        {
+            return _userContext.Users.Where(u => u.PhoneNumber == userPhone).FirstOrDefault();
+        }
     }
 }
