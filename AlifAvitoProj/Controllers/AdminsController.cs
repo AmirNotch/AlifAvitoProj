@@ -17,12 +17,20 @@ namespace AlifAvitoProj.Controllers
         private ICityRepository _cityRepository;
         private ICategoryRepository _categoryRepository;
         private IUserRepository _userRepository;
+        private IReviewerRepository _reviewerRepository;
+        private IReviewRepository _reviewRepository;
 
-        public AdminsController(ICityRepository cityRepository, ICategoryRepository categoryRepository, IUserRepository userRepository)
+        public AdminsController(ICityRepository cityRepository, 
+                                ICategoryRepository categoryRepository, 
+                                IUserRepository userRepository,
+                                IReviewerRepository reviewerRepository,
+                                IReviewRepository reviewRepository)
         {
             _categoryRepository = categoryRepository;
             _cityRepository = cityRepository;
             _userRepository = userRepository;
+            _reviewerRepository = reviewerRepository;
+            _reviewRepository = reviewRepository;
         }
 
         //api/admins
@@ -554,6 +562,73 @@ namespace AlifAvitoProj.Controllers
             if (!_userRepository.DeleteUser(deleteAuthor))
             {
                 ModelState.AddModelError("", $"Something went wrong deleting {deleteAuthor.FirstName}  {deleteAuthor.PhoneNumber}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+
+        //api/reviewers
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewerDto>))]
+        public async Task<IActionResult> GetReviewers()
+        {
+            var reviewers = _reviewerRepository.GetReviewers();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var reviewerDto = new List<ReviewerDto>();
+
+            foreach (var reviewer in reviewers)
+            {
+                reviewerDto.Add(new ReviewerDto
+                {
+                    Id = reviewer.Id,
+                    FirstName = reviewer.FirstName,
+                    LastName = reviewer.LastName
+                });
+            }
+
+            return Ok(reviewerDto);
+        }
+
+
+        //api/reviewers/reviewerId
+        [HttpDelete("{reviewerId}")]
+        [ProducesResponseType(204)] // no content
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!_reviewerRepository.ReviewerExistsById(reviewerId))
+            {
+                return NotFound();
+            }
+
+            var deleteReviewer = _reviewerRepository.GetReviewerById(reviewerId);
+            var deleteReviews = _reviewerRepository.GetReviewsByReviewer(reviewerId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.DeleteReviewer(deleteReviewer))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting " +
+                                            $"{deleteReviewer.FirstName} and {deleteReviewer.LastName}");
+                return StatusCode(500, ModelState);
+            }
+
+            if (!_reviewRepository.DeleteReviews(deleteReviews.ToList()))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting " +
+                                            $"{deleteReviewer.FirstName} and {deleteReviewer.LastName}");
                 return StatusCode(500, ModelState);
             }
 
