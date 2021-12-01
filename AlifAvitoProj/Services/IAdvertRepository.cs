@@ -8,16 +8,16 @@ namespace AlifAvitoProj.Services
 {
     public interface IAdvertRepository
     {
-        ICollection<Advert> GetBooks();
-        Advert GetBook(int advertId);
-        Advert GetBook(string advertTitle);
+        ICollection<Advert> GetAdverts();
+        Advert GetAdvert(int advertId);
+        Advert GetAdvert(string advertTitle);
         bool AdvertExists(int advertId);
         bool AdvertExists(string advertTitle);
         bool IsDuplicateTitle(int advertId, string advertTitle);
         decimal GetAdvertRating(int advertId);
 
-        bool CreateAdvert(int advertsId, int categoriesId, Advert advert);
-        bool UpdateAdvert(int advertsId, int categoriesId, Advert advert);
+        bool CreateAdvert(int usersId, int categoriesId, Advert advert);
+        bool UpdateAdvert(int usersId, int categoriesId, Advert advert);
         bool DeleteAdvert(Advert advert);
         bool Save();
     }
