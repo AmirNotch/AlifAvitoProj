@@ -60,7 +60,7 @@ namespace AlifAvitoProj.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [ProducesResponseType(201, Type = typeof(User))]
-        public async Task<IActionResult> CreateAuthor([FromBody] User userToCreate)
+        public async Task<IActionResult> CreateUser([FromBody] User userToCreate)
         {
             
             if (userToCreate == null)
@@ -99,7 +99,7 @@ namespace AlifAvitoProj.Controllers
             return CreatedAtRoute("GetUsers", new { userId = userToCreate.Id }, userToCreate);
         }
 
-        //api/users/authorId
+        //api/users/userId
         [HttpPut("users/{userId}")]
         [ProducesResponseType(204)] // no content
         [ProducesResponseType(400)]
@@ -107,7 +107,6 @@ namespace AlifAvitoProj.Controllers
         [ProducesResponseType(200, Type = typeof(User))]
         public async Task<IActionResult> UpdateUser([FromRoute] int userId, [FromBody] User updatedUserInfo)
         {
-
             updatedUserInfo.Id = userId;
 
             if (updatedUserInfo == null)
@@ -117,12 +116,12 @@ namespace AlifAvitoProj.Controllers
 
             if (!_userRepository.UserExists(userId))
             {
-                ModelState.AddModelError("", "Author doesn't exist!");
+                ModelState.AddModelError("", "User doesn't exist!");
             }
 
             if (!_cityRepository.CityExistsById(updatedUserInfo.City.Id))
             {
-                ModelState.AddModelError("", "Country doesn't exist!");
+                ModelState.AddModelError("", "City doesn't exist!");
             }
 
             if (!ModelState.IsValid)
@@ -137,7 +136,7 @@ namespace AlifAvitoProj.Controllers
 
             if (!_userRepository.UpdateUser(updatedUserInfo))
             {
-                ModelState.AddModelError("", $"Something went wrong updating the author " + $"{updatedUserInfo.FirstName} and {updatedUserInfo.PhoneNumber}");
+                ModelState.AddModelError("", $"Something went wrong updating the user " + $"{updatedUserInfo.FirstName} and {updatedUserInfo.PhoneNumber}");
                 return StatusCode(500, ModelState);
             }
 

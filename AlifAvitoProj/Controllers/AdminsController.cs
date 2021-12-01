@@ -495,7 +495,7 @@ namespace AlifAvitoProj.Controllers
         }
 
 
-        //api/authors/authorId
+        //api/users/userId
         [HttpPost("users", Name = "GetUsers")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -524,5 +524,40 @@ namespace AlifAvitoProj.Controllers
             return Ok(userDto);
         }
 
+
+        //api/users/userId
+        [HttpDelete("{userId}")]
+        [ProducesResponseType(204)] // no content
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteUser(int userId)
+        {
+            if (!_userRepository.UserExists(userId))
+            {
+                return NotFound();
+            }
+
+            var deleteAuthor = _userRepository.GetUserById(userId);
+
+            if (_userRepository.GetAdvertsByUser(userId).Count() > 0)
+            {
+                ModelState.AddModelError("", $"User {deleteAuthor.FirstName}  {deleteAuthor.PhoneNumber} " +
+                                                                "can not be deleted because user used some adverts");
+                return StatusCode(409, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_userRepository.DeleteUser(deleteAuthor))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting {deleteAuthor.FirstName}  {deleteAuthor.PhoneNumber}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }
