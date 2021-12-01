@@ -28,28 +28,26 @@ namespace AlifAvitoProj.Services
 
         public bool CreateAdvert(int usersId, int categoriesId, Advert advert)
         {
-            var users = _advertContext.Users.Where(a => usersId == a.Id).ToList();
-            var categories = _advertContext.Categories.Where(c => categoriesId == c.Id).ToList();
+            var users = _advertContext.Users.Where(a => usersId == a.Id).FirstOrDefault();
+            var categories = _advertContext.Categories.Where(c => categoriesId == c.Id).FirstOrDefault();
 
-            foreach (var user in users)
-            {
+           
                 var advertUsers = new AdvertUser()
                 {
-                    User = user,
+                    User = users,
                     Advert = advert
                 };
                 _advertContext.Add(advertUsers);
-            }
+            
 
-            foreach (var category in categories)
-            {
+            
                 var advertCategory = new AdvertCategory()
                 {
-                    Category = category,
+                    Category = categories,
                     Advert = advert
                 };
                 _advertContext.Add(advertCategory);
-            }
+            
 
             _advertContext.AddAsync(advert);
 

@@ -59,6 +59,23 @@ namespace AlifAvitoProj.Controllers
 
 
         //api/users
+        [HttpGet("users/Check")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(201, Type = typeof(User))]
+        public async Task<IActionResult> CreateUser([FromRoute] int userPhone)
+        {
+
+            if (!_userRepository.UserExistsByPhone(userPhone))
+            {
+                ModelState.AddModelError("", "User doesn't exist!");
+            }
+
+            return Ok("User exist");
+        }
+
+        //api/users
         [HttpPost("users/CreateUser")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -268,7 +285,7 @@ namespace AlifAvitoProj.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [ProducesResponseType(201, Type = typeof(Advert))]
-        public IActionResult CreateAdvert([FromQuery] int userId, [FromQuery] int catId,
+        public IActionResult CreateAdvert([FromRoute] int userId, [FromRoute] int catId,
                                         [FromBody] Advert advertToCreate)
         {
             advertToCreate.DatePublished = DateTime.UtcNow;
@@ -376,18 +393,18 @@ namespace AlifAvitoProj.Controllers
                 return BadRequest();
             }
 
-            if (_advertRepository.IsDuplicateTitle(advert.Id, advert.Title))
+            /*if (_advertRepository.IsDuplicateTitle(advert.Id, advert.Title))
             {
-                ModelState.AddModelError("", "Duplicate ISBN");
+                ModelState.AddModelError("", "Duplicate Title");
                 return StatusCode(422);
-            }
+            }*/
 
             
-            if (!_categoryRepository.CategoryExistsById(userId))
+            /*if (!_categoryRepository.CategoryExistsById(userId))
             {
                 ModelState.AddModelError("", "Category not found");
                 return StatusCode(404);
-            }
+            }*/
             
 
             if (!ModelState.IsValid)

@@ -25,6 +25,38 @@ namespace AlifAvitoProj.Controllers
             _advertRepository = advertRepository;
         }
 
+
+        //api/adverts
+        [HttpGet("adverts")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<AdvertDto>))]
+        public async Task<IActionResult> GetAdverts()
+        {
+            var adverts = _advertRepository.GetAdverts();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var advertsDto = new List<AdvertDto>();
+
+            foreach (var advert in adverts)
+            {
+                advertsDto.Add(new AdvertDto
+                {
+                    Id = advert.Id,
+                    Title = advert.Title,
+                    ReviewText = advert.ReviewText,
+                    Cost = advert.Cost,
+                    DatePublished = advert.DatePublished
+                });
+            }
+
+            return Ok(advertsDto);
+        }
+
         //api/reviewers
         [HttpGet("GetReviewers")]
         [ProducesResponseType(400)]
@@ -416,12 +448,12 @@ namespace AlifAvitoProj.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!_reviewerRepository.ReviewerExists(updatedReviewInfo.Reviewer.Id))
+            if (!_reviewerRepository.ReviewerExistsById(updatedReviewInfo.Reviewer.Id))
             {
                 ModelState.AddModelError("", "Reviewer doesn't exist!");
             }
 
-            if (!_bookRepository.BookExists(updatedReviewInfo.Book.Id))
+            if (!_advertRepository.AdvertExists(updatedReviewInfo.Advert.Id))
             {
                 ModelState.AddModelError("", "Book doesn't exist!");
             }
@@ -431,8 +463,8 @@ namespace AlifAvitoProj.Controllers
                 return StatusCode(404, ModelState);
             }
 
-            updatedReviewInfo.Book = _bookRepository.GetBook(updatedReviewInfo.Book.Id);
-            updatedReviewInfo.Reviewer = _reviewerRepository.GetReviewer(updatedReviewInfo.Reviewer.Id);
+            updatedReviewInfo.Advert = _advertRepository.GetAdvert(updatedReviewInfo.Advert.Id);
+            updatedReviewInfo.Reviewer = _reviewerRepository.GetReviewerById(updatedReviewInfo.Reviewer.Id);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

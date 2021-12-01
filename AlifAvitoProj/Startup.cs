@@ -46,6 +46,7 @@ namespace AlifAvitoProj
 
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IAdvertRepository, AdvertRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<IReviewerRepository, ReviewerRepository>();
