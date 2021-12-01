@@ -22,6 +22,7 @@ namespace AlifAvitoProj.Context
         public virtual DbSet<Reviewer> Reviewers { get; set; } 
         public virtual DbSet<AdvertUser> AdvertUsers { get; set; } 
         public virtual DbSet<AdvertCategory> AdvertCategories { get; set; }
+        public virtual DbSet<WarningUser> WarningUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

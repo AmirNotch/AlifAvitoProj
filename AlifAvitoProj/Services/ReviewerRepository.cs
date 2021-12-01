@@ -33,6 +33,11 @@ namespace AlifAvitoProj.Services
             return _reviewerContext.Reviewers.Where(r => r.FirstName.Contains(reviewerName)).FirstOrDefault();
         }
 
+        public Reviewer GetReviewerById(int reviewerId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Reviewer GetReviewerOfAReview(int reviewId)
         {
             var reviewerId = _reviewerContext.Reviews.Where(r => r.Id == reviewId).Select(rr => rr.Reviewer.Id).FirstOrDefault();
@@ -44,7 +49,7 @@ namespace AlifAvitoProj.Services
             return _reviewerContext.Reviewers.OrderBy(r => r.FirstName).ToList();
         }
 
-        public ICollection<Review> GetReviewsByReviewer(int reviewerName)
+        public ICollection<Review> GetReviewsByReviewer(int reviewerId)
         {
             return _reviewerContext.Reviews.Where(r => r.Reviewer.Id == reviewerId).ToList();
         }

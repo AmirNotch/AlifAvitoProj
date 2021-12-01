@@ -570,7 +570,7 @@ namespace AlifAvitoProj.Controllers
 
 
         //api/reviewers
-        [HttpGet]
+        [HttpGet("reviewers")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewerDto>))]
