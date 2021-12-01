@@ -15,12 +15,14 @@ namespace AlifAvitoProj.Controllers
     public class ReviewersController : ControllerBase
     {
         private IReviewRepository _reviewRepository;
+        private IAdvertRepository _advertRepository;
         private IReviewerRepository _reviewerRepository;
 
-        public ReviewersController(IReviewRepository reviewRepository, IReviewerRepository reviewerRepository)
+        public ReviewersController(IReviewRepository reviewRepository, IReviewerRepository reviewerRepository, IAdvertRepository advertRepository)
         {
             _reviewRepository = reviewRepository;
             _reviewerRepository = reviewerRepository;
+            _advertRepository = advertRepository;
         }
 
         //api/reviewers
@@ -281,12 +283,12 @@ namespace AlifAvitoProj.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewDto>))]
         public async Task<IActionResult> GetReviewsOfABook(int bookId)
         {
-            if (!_bookRepository.BookExists(bookId))
+            if (!_advertRepository.AdvertExists(bookId))
             {
                 return NotFound();
             }
 
-            var reviews = _reviewRepository.GetReviewsOfABook(bookId);
+            var reviews = _reviewRepository.GetReviewsOfAdvert(bookId);
 
             if (!ModelState.IsValid)
             {
@@ -309,39 +311,40 @@ namespace AlifAvitoProj.Controllers
             return Ok(reviewsDto);
         }
 
-        //api/reviews/reviewId/book
-        [HttpGet("{reviewId}/book")]
+        //api/reviews/reviewId/advert
+        [HttpGet("{reviewId}/advert")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<BookDto>))]
-        public async Task<IActionResult> GetBookOfAReview(int reviewId)
+        [ProducesResponseType(200, Type = typeof(IEnumerable<AdvertDto>))]
+        public async Task<IActionResult> GetAdvertOfAReview(int reviewId)
         {
             if (!_reviewRepository.ReviewExists(reviewId))
             {
                 return NotFound();
             }
 
-            var book = _reviewRepository.GetBookOfAReview(reviewId);
+            var advert = _reviewRepository.GetAdvertOfAReview(reviewId);
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var bookDto = new BookDto
+            var advertDto = new AdvertDto
             {
-                Id = book.Id,
-                Isbn = book.Isbn,
-                Title = book.Title,
-                DatePublished = book.DatePublished
+                Id = advert.Id,
+                Title = advert.Title,
+                ReviewText = advert.ReviewText,
+                Cost = advert.Cost,
+                DatePublished = advert.DatePublished
             };
 
-            return Ok(bookDto);
+            return Ok(advertDto);
         }
 
 
         //api/reviews
-        [HttpPost]
+        [HttpPost("reviewCreate")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -353,12 +356,12 @@ namespace AlifAvitoProj.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!_reviewerRepository.ReviewerExists(reviewToCreate.Reviewer.Id))
+            if (!_reviewerRepository.ReviewerExistsById(reviewToCreate.Reviewer.Id))
             {
                 ModelState.AddModelError("", "Reviewer doesn't exist!");
             }
 
-            if (!_bookRepository.BookExists(reviewToCreate.Book.Id))
+            if (!_advertRepository.AdvertExists(reviewToCreate.Advert.Id))
             {
                 ModelState.AddModelError("", "Book doesn't exist!");
             }
@@ -368,8 +371,8 @@ namespace AlifAvitoProj.Controllers
                 return StatusCode(404, ModelState);
             }
 
-            reviewToCreate.Book = _bookRepository.GetBook(reviewToCreate.Book.Id);
-            reviewToCreate.Reviewer = _reviewerRepository.GetReviewer(reviewToCreate.Reviewer.Id);
+            reviewToCreate.Advert = _advertRepository.GetAdvert(reviewToCreate.Advert.Id);
+            reviewToCreate.Reviewer = _reviewerRepository.GetReviewerById(reviewToCreate.Reviewer.Id);
 
 
             /*var country = _categoryRepository.GetCategories()
